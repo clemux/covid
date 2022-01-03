@@ -16,7 +16,7 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
         usecols=["jour", "P", "cl_age90", 'T'],
         sep=';'
     )
-    end_date = date.today() - timedelta(days=3)
+    end_date = date.today()
 
     everyone_data = sidep_data.loc[sidep_data.loc[:, 'cl_age90'] == 0]
     latest_data: pd.DataFrame = everyone_data[start_date:end_date]
