@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import argparse
 from datetime import timedelta, date
 from pathlib import Path
@@ -7,7 +9,7 @@ import pandas as pd
 
 
 def get_latest_data(start_date: date) -> pd.DataFrame:
-    sidep_data = pd.read_csv(
+    sidep_data: pd.DataFrame = pd.read_csv(
         'https://www.data.gouv.fr/fr/datasets/r/dd0de5d9-b5a5-4503-930a-7b08dc0adc7c',
         parse_dates=True,
         index_col="jour",
@@ -17,24 +19,33 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     end_date = date.today() - timedelta(days=3)
 
     everyone_data = sidep_data.loc[sidep_data.loc[:, 'cl_age90'] == 0]
-    latest_data = everyone_data[start_date:end_date]
+    latest_data: pd.DataFrame = everyone_data[start_date:end_date]
     latest_data = latest_data.drop(['cl_age90'], axis=1)
 
     rolling_mean = latest_data['P'].rolling(min_periods=1, window=7).mean().round(decimals=0).astype(int)
     latest_data['Mean'] = rolling_mean
 
     # Improve output
-    latest_data = latest_data.rename(columns={
-        'P': 'New positive cases',
-        'Mean': 'Rolling avg (7d)',
-        'T': 'Number of tests',
-    })
+    latest_data = latest_data.rename(
+        columns={
+            'P': 'New positive cases',
+            'Mean': 'Rolling average (7d)',
+            'T': 'Number of tests',
+        },
+    )
+    latest_data = latest_data.rename_axis(
+        "Date",
+        axis='rows'
+    )
+
     return latest_data
 
 
 def write_file(data: pd.DataFrame, path: Optional[Path] = None, format_: Optional[str] = 'html') -> None:
     func = data.to_html
     match format_:
+        case 'html':
+            pass
         case 'csv':
             func = data.to_csv
         case 'json':
