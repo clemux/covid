@@ -1,5 +1,4 @@
 import argparse
-import sys
 from datetime import timedelta, date
 from pathlib import Path
 from typing import Optional
@@ -24,7 +23,6 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     rolling_mean = latest_data['P'].rolling(min_periods=1, window=7).mean().round(decimals=0).astype(int)
     latest_data['Mean'] = rolling_mean
 
-
     # Improve output
     latest_data = latest_data.rename(columns={
         'P': 'New positive cases',
@@ -33,14 +31,17 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     })
     return latest_data
 
-def write_file(data: pd.DataFrame, path: Optional[Path] = None, format: Optional[str] = 'html') -> None:
-    match format:
-        case 'html':
-            func = data.to_html
+
+def write_file(data: pd.DataFrame, path: Optional[Path] = None, format_: Optional[str] = 'html') -> None:
+    func = data.to_html
+    match format_:
         case 'csv':
             func = data.to_csv
+        case 'json':
+            func = data.to_json
     with open(path, 'w') as f:
         func(f)
+
 
 if __name__ == '__main__':
     last_week = date.today() - timedelta(7) - timedelta(3)
@@ -54,6 +55,6 @@ if __name__ == '__main__':
     output_data = get_latest_data(start_date=args.start)
 
     if args.path is not None:
-        write_file(data=output_data, path=args.path, format=args.format)
+        write_file(data=output_data, path=args.path, format_=args.format)
     else:
         print(output_data)
