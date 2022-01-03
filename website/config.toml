@@ -1,3 +1,4 @@
-baseURL = "http://example.org/"
+baseURL = "http://mux.me/covid/"
 languageCode = "en-us"
-title = "My New Hugo Site"
+title = "Some covid data"
+theme = "basic-mux"
