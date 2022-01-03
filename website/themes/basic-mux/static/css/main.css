@@ -22,7 +22,6 @@ blockquote {
 table {
   table-layout: fixed;
   width: 100%;
-  border-collapse: collapse;
   border: #000000;
 }
 
@@ -46,14 +45,12 @@ th, td {
   padding: 20px;
 }
 
-/* zebra striping */
-
 tbody tr:nth-child(odd) {
-  background-color: #dedede;
+  background-color: #f1f1f1;
 }
 
 tbody tr:nth-child(even) {
-  background-color: #d2d2d2;
+  background-color: #ffffff;
 }
 
 
