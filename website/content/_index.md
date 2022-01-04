@@ -8,3 +8,5 @@ draft: false
 
 ## New cases and stuff
 
+Update every evening with new cases from 3 days before (SI-DEP data)
+
