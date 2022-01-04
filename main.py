@@ -13,24 +13,32 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
         'https://www.data.gouv.fr/fr/datasets/r/dd0de5d9-b5a5-4503-930a-7b08dc0adc7c',
         parse_dates=True,
         index_col="jour",
-        usecols=["jour", "P", "cl_age90", 'T'],
+        usecols=["jour", "P", "cl_age90", 'T', 'pop'],
         sep=';'
     )
     end_date = date.today()
 
     everyone_data = sidep_data.loc[sidep_data.loc[:, 'cl_age90'] == 0]
     latest_data: pd.DataFrame = everyone_data[start_date:end_date]
-    latest_data = latest_data.drop(['cl_age90'], axis=1)
 
-    rolling_mean = latest_data['P'].rolling(min_periods=1, window=7).mean().round(decimals=0).astype(int)
+    latest_data['Ratio'] = (100*latest_data['P']/latest_data['T']).round(decimals=1)
+    latest_data['P'] = (latest_data['P']/1000).round(decimals=1)
+    latest_data['T'] = (latest_data['T']/1000).round(decimals=1)
+    rolling_mean = (
+        latest_data['P'].rolling(min_periods=1, window=7).mean()
+    ).round(decimals=1).astype(int)
     latest_data['Mean'] = rolling_mean
 
+    latest_data = latest_data.drop(['cl_age90'], axis=1)
+    latest_data = latest_data.drop(['pop'], axis=1)
     # Improve output
     latest_data = latest_data.rename(
         columns={
-            'P': 'New positive cases',
-            'Mean': 'Rolling average (7d)',
-            'T': 'Number of tests',
+            'P': 'Nouveaux cas positifs (milliers)',
+            'Mean': 'Moyenne glissante sur 7j (milliers)',
+            'T': 'Nombre de tests (milliers)',
+            'Ratio': "Taux de positivité (%)"
+
         },
     )
     latest_data = latest_data.rename_axis(
