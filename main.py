@@ -63,7 +63,7 @@ def write_file(data: pd.DataFrame, path: Optional[Path] = None, format_: Optiona
 
 
 if __name__ == '__main__':
-    last_week = date.today() - timedelta(7) - timedelta(3)
+    last_week = date.today() - timedelta(10) - timedelta(3)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--start', required=False, default=last_week)
