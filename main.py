@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import subprocess
 from datetime import timedelta, date
 from pathlib import Path
 from typing import Optional
@@ -62,18 +63,36 @@ def write_file(data: pd.DataFrame, path: Optional[Path] = None, format_: Optiona
         func(f)
 
 
+def build_data_cmd(args):
+    data = get_latest_data(start_date=args.start)
+    print(data)
+
+
+def build_website_cmd(args):
+    cmd = ['hugo']
+    if args.server:
+        cmd.append('server')
+    subprocess.run(cmd, cwd=args.dir)
+
+
 if __name__ == '__main__':
     last_week = date.today() - timedelta(10) - timedelta(3)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--start', required=False, default=last_week)
-    parser.add_argument('--path', required=False, default=None, dest='path')
-    parser.add_argument('--format', required=False, default='csv')
+    sub_parsers = parser.add_subparsers()
+
+    # build data
+    build_data_parser = sub_parsers.add_parser('build-data')
+    build_data_parser.add_argument('--start', required=False, default=last_week)
+    build_data_parser.add_argument('--path', required=False, default=None, dest='path')
+    build_data_parser.add_argument('--format', required=False, default='csv')
+    build_data_parser.set_defaults(func=build_data_cmd)
+
+    # build website
+    build_website_parser = sub_parsers.add_parser('build-website')
+    build_website_parser.add_argument('--dir', required=False, default='.')
+    build_website_parser.add_argument('--server', required=False, default=False)
+    build_website_parser.set_defaults(func=build_website_cmd)
+
     args = parser.parse_args()
-
-    output_data = get_latest_data(start_date=args.start)
-
-    if args.path is not None:
-        write_file(data=output_data, path=args.path, format_=args.format)
-    else:
-        print(output_data)
+    args.func(args)
