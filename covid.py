@@ -3,8 +3,6 @@
 import argparse
 import subprocess
 from datetime import timedelta, date
-from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -33,15 +31,15 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     latest_data = latest_data.drop(['cl_age90'], axis=1)
     latest_data = latest_data.drop(['pop'], axis=1)
     # Improve output
-    latest_data = latest_data.rename(
-        columns={
-            'P': 'Nouveaux cas positifs (milliers)',
-            'Mean': 'Moyenne glissante sur 7j (milliers)',
-            'T': 'Nombre de tests (milliers)',
-            'Ratio': "Taux de positivité (%)"
-
-        },
-    )
+    # latest_data = latest_data.rename(
+    #     columns={
+    #         'P': 'Nouveaux cas positifs (milliers)',
+    #         'Mean': 'Moyenne glissante sur 7j (milliers)',
+    #         'T': 'Nombre de tests (milliers)',
+    #         'Ratio': "Taux de positivité (%)"
+    #
+    #     },
+    # )
     latest_data = latest_data.rename_axis(
         "Date",
         axis='rows'
@@ -50,25 +48,27 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     return latest_data
 
 
-def write_file(data: pd.DataFrame, path: Optional[Path] = None, format_: Optional[str] = 'html') -> None:
-    func = data.to_html
+def format_data(df: pd.DataFrame, format_: str) -> str:
+    func = df.to_csv
     match format_:
         case 'html':
             pass
-        case 'csv':
-            func = data.to_csv
         case 'json':
-            func = data.to_json
-    with open(path, 'w') as f:
-        func(f)
+            func = df.to_json
+    return func(columns=['P', 'T', 'Mean', 'Ratio'])
 
 
-def build_data_cmd(args):
+def build_data_cmd(args) -> None:
     data = get_latest_data(start_date=args.start)
-    print(data)
+    formatted_data = format_data(data, format_=args.format)
+    if args.path is not None:
+        with open(args.path, 'w') as f:
+            f.write(formatted_data)
+    else:
+        print(formatted_data)
 
 
-def build_website_cmd(args):
+def build_website_cmd(args) -> None:
     cmd = ['hugo']
     if args.server:
         cmd.append('server')
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     last_week = date.today() - timedelta(10) - timedelta(3)
 
     parser = argparse.ArgumentParser()
-    sub_parsers = parser.add_subparsers()
+    sub_parsers = parser.add_subparsers(required=True)
 
     # build data
     build_data_parser = sub_parsers.add_parser('build-data')
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     # build website
     build_website_parser = sub_parsers.add_parser('build-website')
     build_website_parser.add_argument('--dir', required=False, default='.')
-    build_website_parser.add_argument('--server', required=False, default=False)
+    build_website_parser.add_argument('--server', action='store_true')
     build_website_parser.set_defaults(func=build_website_cmd)
 
     args = parser.parse_args()
