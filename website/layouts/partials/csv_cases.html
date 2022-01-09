@@ -1,14 +1,25 @@
+{{ $url := "cases.csv" }}
+{{ $sep := "," }}
+{{ $csv :=  getCSV $sep $url }}
 <table>
+    <thead>
+        <tr>
+            <th>{{ index (index $csv 0) 0}}</th>
+            <th>{{ index (index $csv 0) 1}}</th>
+            <th>{{ index (index $csv 0) 2}}</th>
+            <th>{{ index (index $csv 0) 3}}</th>
+            <th>{{ index (index $csv 0) 4}}</th>
+        </tr>
+    </thead>
     <tbody>
-    {{ $url := "cases.csv" }}
-    {{ $sep := "," }}
-    {{ range $i, $r := getCSV $sep $url }}
+    {{ $rows := after 1 $csv }}
+    {{ range $i,  $r := $rows }}
       <tr>
         <td>{{ index $r 0 }}</td>
         <td>{{ index $r 1 }}</td>
         <td>{{ index $r 2 }}</td>
-        <td>{{ index $r 4 }}</td>
         <td>{{ index $r 3 }}</td>
+        <td>{{ index $r 4 }}</td>
       </tr>
     {{ end }}
     </tbody>
