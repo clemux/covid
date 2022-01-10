@@ -82,6 +82,7 @@ def build_website_cmd(args) -> None:
         html = template.render(
             title='Covid Mux',
             data=data,
+            run_datetime=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         )
         f.write(html)
 
