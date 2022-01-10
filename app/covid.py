@@ -72,6 +72,7 @@ def build_website_cmd(args) -> None:
     cmd = ['hugo']
     if args.server:
         cmd.append('server')
+    cmd.extend(['--destination', args.dest])
     subprocess.run(cmd, cwd=args.dir)
 
 
@@ -91,6 +92,7 @@ def main():
     # build website
     build_website_parser = sub_parsers.add_parser('build-website')
     build_website_parser.add_argument('--dir', required=False, default='.')
+    build_website_parser.add_argument('--dest', required=False, default='public')
     build_website_parser.add_argument('--server', action='store_true')
     build_website_parser.set_defaults(func=build_website_cmd)
 
