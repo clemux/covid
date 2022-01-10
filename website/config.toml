@@ -1,4 +1,0 @@
-baseURL = "http://mux.me/covid/"
-languageCode = "en-us"
-title = "Some covid data"
-theme = "basic-mux"

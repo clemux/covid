@@ -64,6 +64,7 @@ def build_data_cmd(args) -> None:
     else:
         print(formatted_data)
 
+
 def build_website_cmd(args) -> None:
     last_week = date.today() - timedelta(10) - timedelta(3)
     data = get_latest_data(last_week)
