@@ -75,7 +75,7 @@ def build_website_cmd(args) -> None:
     subprocess.run(cmd, cwd=args.dir)
 
 
-if __name__ == '__main__':
+def main():
     last_week = date.today() - timedelta(10) - timedelta(3)
 
     parser = argparse.ArgumentParser()
