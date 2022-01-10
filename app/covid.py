@@ -3,8 +3,9 @@
 import argparse
 import os
 import shutil
-import subprocess
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
+from os.path import isdir
+from pathlib import Path
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader
@@ -54,7 +55,8 @@ def format_data(df: pd.DataFrame, format_: str) -> str:
 
 
 def build_data_cmd(args) -> None:
-    data = get_latest_data(start_date=args.start)
+    start = datetime.strptime(args.start, '%Y-%m-%d')
+    data = get_latest_data(start_date=start)
     formatted_data = format_data(data, format_=args.format)
     if args.path is not None:
         with open(args.path, 'w') as f:
@@ -70,12 +72,12 @@ def build_website_cmd(args) -> None:
     env = Environment(loader=FileSystemLoader('website'))
     template = env.get_template('index.html')
 
-    # TODO: clean me up
-    shutil.rmtree('./public')
-    os.mkdir('./public')
-    shutil.copytree('website/static', 'public/static')
+    if isdir(args.dest):
+        shutil.rmtree(args.dest)
+    os.mkdir(args.dest)
+    shutil.copytree('website/static', args.dest / 'static')
 
-    with open('public/index.html', 'w') as f:
+    with open(args.dest / 'index.html', 'w') as f:
         html = template.render(
             title='Covid Mux',
             data=data,
@@ -83,7 +85,7 @@ def build_website_cmd(args) -> None:
         f.write(html)
 
 def main():
-    last_week = date.today() - timedelta(10) - timedelta(3)
+    last_week = (date.today() - timedelta(10) - timedelta(3)).strftime('%Y-%m-%d')
 
     parser = argparse.ArgumentParser()
     sub_parsers = parser.add_subparsers(required=True)
@@ -98,8 +100,12 @@ def main():
     # build website
     build_website_parser = sub_parsers.add_parser('build-website')
     build_website_parser.add_argument('--src', required=False, default='website')
-    build_website_parser.add_argument('--dest', required=False, default='public')
+    build_website_parser.add_argument('--dest', required=False, default='public', type=Path)
     build_website_parser.set_defaults(func=build_website_cmd)
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == '__main__':
+    main()
