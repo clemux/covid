@@ -99,7 +99,6 @@ def main():
 
     # build website
     build_website_parser = sub_parsers.add_parser('build-website')
-    build_website_parser.add_argument('--src', required=False, default='website')
     build_website_parser.add_argument('--dest', required=False, default='public', type=Path)
     build_website_parser.set_defaults(func=build_website_cmd)
 
