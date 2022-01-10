@@ -14,4 +14,6 @@ RUN python3 -m venv venv
 RUN venv/bin/pip install -U pip
 RUN venv/bin/pip install .
 
+ENV OMP_NUM_THREADS=1
+
 ENTRYPOINT ["/opt/covid/venv/bin/covidmux"]
