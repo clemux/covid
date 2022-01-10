@@ -12,14 +12,16 @@
 </header>
 <div class="homepage-content">
     <p>Last updated: {{ run_datetime }} UTC</p>
+<h2>Basic numbers</h2>
     <table>
         <thead>
         <tr>
-            <th>Date (J-3)</th>
+            <th>Date (D-3)</th>
             <th>Daily cases</th>
             <th>Daily tests</th>
             <th>Daily cases (rolling average 7d)</th>
             <th>Positive tests rate</th>
+            <th>Rate, rolling average (7d)</th>
         </tr>
         </thead>
         <tbody>
@@ -30,6 +32,7 @@
                 <td>{{ row['T'] }}k</td>
                 <td>{{ row['Mean']}}k</td>
                 <td>{{ row['Ratio']}}%</td>
+                <td>{{ row['RollingRate']}}%</td>
             </tr>
         {% endfor %}
         </tbody>

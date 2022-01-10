@@ -26,13 +26,19 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
 
     p = latest_data.loc[:, 'P'].copy()
     t = latest_data.loc[:, 'T'].copy()
-    latest_data.loc[:, 'Ratio'] = (100*p/t).round(decimals=1)
+    r: pd.DataFrame = 100*p/t
+    latest_data.loc[:, 'Ratio'] = r.round(decimals=1)
     latest_data.loc[:, 'P'] = (p/1000).round(decimals=1)
     latest_data.loc[:, 'T'] = (t/1000).round(decimals=1)
     rolling_mean = (
         p.rolling(min_periods=1, window=7).mean()/1000
     ).round(decimals=1).astype(int)
     latest_data.loc[:, 'Mean'] = rolling_mean
+
+    rolling_rate = (
+        r.rolling(min_periods=1, window=7).mean().round(decimals=1)
+    )
+    latest_data.loc[:, 'RollingRate'] = rolling_rate
 
     latest_data = latest_data.drop(['cl_age90'], axis=1)
     latest_data = latest_data.drop(['pop'], axis=1)
@@ -51,7 +57,7 @@ def format_data(df: pd.DataFrame, format_: str) -> str:
             pass
         case 'json':
             func = df.to_json
-    return func(columns=['P', 'T', 'Mean', 'Ratio'])
+    return func(columns=['P', 'T', 'Mean', 'Ratio', 'RollingRate'])
 
 
 def build_data_cmd(args) -> None:
@@ -65,18 +71,43 @@ def build_data_cmd(args) -> None:
         print(formatted_data)
 
 
+# def build_test_plot(data: pd.DataFrame, path: Path):
+#     sns.set(rc={
+#         'figure.figsize': (12, 5),
+#     })
+#     p = sns.lineplot(data=data, x='Date', y='T')
+#     p.set_ylabel('Number of tests')
+#     p.figure.savefig(path)
+#     plt.clf()
+#
+# def build_rate_plot(data: pd.DataFrame, path: Path):
+#     sns.set(rc={
+#         'figure.figsize': (12, 5),
+#     })
+#     p = sns.lineplot(data=data, x='Date', y='Ratio')
+#     p.set_ylabel('Positive rate (%)')
+#     p.figure.savefig(path)
+#     plt.clf()
+
+
 def build_website_cmd(args) -> None:
     last_week = date.today() - timedelta(10) - timedelta(3)
     data = get_latest_data(last_week)
-
-    # Jinja2 setup
-    env = Environment(loader=FileSystemLoader('website'))
-    template = env.get_template('index.html')
 
     if isdir(args.dest):
         shutil.rmtree(args.dest)
     os.mkdir(args.dest)
     shutil.copytree('website/static', args.dest / 'static')
+
+    # plot_path = args.dest / 'static' / 'plot.png'
+    # build_test_plot(data=data, path=plot_path)
+    #
+    # rate_plot_path = args.dest / 'static' / 'rate_plot.png'
+    # build_rate_plot(data=data, path=rate_plot_path)
+
+    # Jinja2 setup
+    env = Environment(loader=FileSystemLoader('website'))
+    template = env.get_template('index.html')
 
     with open(args.dest / 'index.html', 'w') as f:
         html = template.render(
