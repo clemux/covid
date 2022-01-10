@@ -8,7 +8,7 @@ COPY pyproject.toml .
 
 COPY website/ website/
 
-RUN dnf -y update && dnf -y install hugo python3.10 && dnf clean all
+RUN dnf -y update && dnf -y install python3.10 && dnf clean all
 
 RUN python3 -m venv venv
 RUN venv/bin/pip install -U pip

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
+import os
+import shutil
 import subprocess
 from datetime import timedelta, date
 
 import pandas as pd
+from jinja2 import Environment, FileSystemLoader
 
 
 def get_latest_data(start_date: date) -> pd.DataFrame:
@@ -67,14 +70,25 @@ def build_data_cmd(args) -> None:
     else:
         print(formatted_data)
 
-
 def build_website_cmd(args) -> None:
-    cmd = ['hugo']
-    if args.server:
-        cmd.append('server')
-    cmd.extend(['--destination', args.dest])
-    subprocess.run(cmd, cwd=args.dir)
+    last_week = date.today() - timedelta(10) - timedelta(3)
+    data = get_latest_data(last_week)
 
+    # Jinja2 setup
+    env = Environment(loader=FileSystemLoader('website'))
+    template = env.get_template('index.html')
+
+    # TODO: clean me up
+    shutil.rmtree('./public')
+    os.mkdir('./public')
+    shutil.copytree('website/static', 'public/static')
+
+    with open('public/index.html', 'w') as f:
+        html = template.render(
+            title='Covid Mux',
+            data=data,
+        )
+        f.write(html)
 
 def main():
     last_week = date.today() - timedelta(10) - timedelta(3)
@@ -91,9 +105,8 @@ def main():
 
     # build website
     build_website_parser = sub_parsers.add_parser('build-website')
-    build_website_parser.add_argument('--dir', required=False, default='.')
+    build_website_parser.add_argument('--src', required=False, default='website')
     build_website_parser.add_argument('--dest', required=False, default='public')
-    build_website_parser.add_argument('--server', action='store_true')
     build_website_parser.set_defaults(func=build_website_cmd)
 
     args = parser.parse_args()
