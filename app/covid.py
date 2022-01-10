@@ -30,7 +30,7 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     latest_data.loc[:, 'P'] = (p/1000).round(decimals=1)
     latest_data.loc[:, 'T'] = (t/1000).round(decimals=1)
     rolling_mean = (
-        p.rolling(min_periods=1, window=7).mean()
+        p.rolling(min_periods=1, window=7).mean()/1000
     ).round(decimals=1).astype(int)
     latest_data.loc[:, 'Mean'] = rolling_mean
 
