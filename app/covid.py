@@ -47,7 +47,7 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
         axis='rows'
     )
 
-    return latest_data
+    return latest_data.reindex(index=latest_data.index[::-1])
 
 
 def format_data(df: pd.DataFrame, format_: str) -> str:
@@ -91,8 +91,8 @@ def build_data_cmd(args) -> None:
 
 
 def build_website_cmd(args) -> None:
-    last_week = date.today() - timedelta(10) - timedelta(3)
-    data = get_latest_data(last_week)
+    start = datetime.strptime(args.start, '%Y-%m-%d')
+    data = get_latest_data(start)
 
     if isdir(args.dest):
         shutil.rmtree(args.dest)
@@ -133,6 +133,8 @@ def main():
     # build website
     build_website_parser = sub_parsers.add_parser('build-website')
     build_website_parser.add_argument('--dest', required=False, default='public', type=Path)
+    build_website_parser.add_argument('--start', required=False, default=last_week)
+
     build_website_parser.set_defaults(func=build_website_cmd)
 
     args = parser.parse_args()
