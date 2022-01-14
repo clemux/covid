@@ -52,11 +52,6 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
 
 def format_data(df: pd.DataFrame, format_: str) -> str:
     func = df.to_csv
-    match format_:
-        case 'html':
-            pass
-        case 'json':
-            func = df.to_json
     return func(columns=['P', 'T', 'Mean', 'Ratio', 'RollingRate'])
 
 
