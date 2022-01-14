@@ -26,5 +26,9 @@ async def add_prediction(message: types.Message):
         }) as r:
             await message.reply(await r.json())
 
-if __name__ == '__main__':
+
+def main():
     executor.start_polling(dp, skip_updates=True)
+
+if __name__ == '__main__':
+    main()
