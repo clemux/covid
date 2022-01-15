@@ -9,9 +9,10 @@
 <header class="homepage-header">
     <h1>Some French covid data</h1>
     <span class="subtitle">Pretty useless, for personal use. Go to covidtracker.fr instead.</span>
+    <p>See <a href="#plots">plots</a> below.</p>
 </header>
 <div class="homepage-content">
-    <p>Last updated: {{ run_datetime }} UTC</p>
+    <p>Last updated: {{ run_datetime | datetime_format }} UTC</p>
 <h2>Basic numbers</h2>
     <table>
         <thead>
@@ -37,6 +38,10 @@
         {% endfor %}
         </tbody>
     </table>
+<h2 id="plots">Plots</h2>
+{% for plot in plots %}
+<img src="static/{{ plot }}.png">
+{% endfor %}
 </div>
 </body>
 </html>

@@ -102,13 +102,15 @@ def build_website_cmd(args) -> None:
 
     # Jinja2 setup
     env = Environment(loader=FileSystemLoader('website'))
+    env.filters['datetime_format'] = datetime_format
     template = env.get_template('index.html')
 
     with open(args.dest / 'index.html', 'w') as f:
         html = template.render(
             title='Covid Mux',
             data=data,
-            run_datetime=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            run_datetime=datetime.now(),
+            plots = ['plot', 'rate_plot'],
         )
         f.write(html)
 
