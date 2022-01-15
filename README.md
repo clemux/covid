@@ -20,5 +20,7 @@ index.html  static
 ```
 podman build -t covid-mux -f container/Dockerfile .
 podman run --rm covid-mux -h
+docker run --rm -v /var/www/html/covidmux/:/data localhost/covid-mux:latest\
+ build-website --dest /data/covid --start 2021-12-01
 ```
 
