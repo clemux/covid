@@ -11,7 +11,9 @@ import pandas as pd
 from jinja2 import Environment, FileSystemLoader
 from matplotlib import pyplot as plt
 
-from app.lib.templates import datetime_format
+
+def datetime_format(value):
+    return value.strftime('%Y-%m-%d %H:%M:%S')
 
 
 def get_latest_data(start_date: date) -> pd.DataFrame:
@@ -70,7 +72,7 @@ def build_data_cmd(args) -> None:
 
 
 def build_cases_plot(data: pd.DataFrame, base_path: Path, name: str):
-    fig, ax = plt.subplots(figsize=(12,5))
+    fig, ax = plt.subplots(figsize=(12, 5))
     bars = ax.bar(data.index, data['P'].values, color='C1')
     line = ax.plot(data.index, data['Mean'].values, color='C2')
     plt.xlabel('Date of tests')
