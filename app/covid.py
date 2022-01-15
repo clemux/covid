@@ -8,7 +8,6 @@ from os.path import isdir
 from pathlib import Path
 
 import pandas as pd
-import seaborn as sns
 from jinja2 import Environment, FileSystemLoader
 from matplotlib import pyplot as plt
 
@@ -29,12 +28,12 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
 
     p = everyone_data.loc[:, 'P'].copy()
     t = everyone_data.loc[:, 'T'].copy()
-    r: pd.DataFrame = 100*p/t
+    r: pd.DataFrame = 100 * p / t
     everyone_data.loc[:, 'Ratio'] = r.round(decimals=1)
-    everyone_data.loc[:, 'P'] = (p/1000).round(decimals=1)
-    everyone_data.loc[:, 'T'] = (t/1000).round(decimals=1)
+    everyone_data.loc[:, 'P'] = (p / 1000).round(decimals=1)
+    everyone_data.loc[:, 'T'] = (t / 1000).round(decimals=1)
     rolling_mean = (
-        p.rolling(min_periods=1, window=7).mean()/1000
+            p.rolling(min_periods=1, window=7).mean() / 1000
     ).round(decimals=1).astype(int)
     everyone_data.loc[:, 'Mean'] = rolling_mean
 
@@ -70,22 +69,21 @@ def build_data_cmd(args) -> None:
         print(formatted_data)
 
 
-def build_test_plot(data: pd.DataFrame, path: Path):
-    sns.set(rc={
-        'figure.figsize': (12, 5),
-    })
-    p = sns.lineplot(data=data, x='Date', y='T')
-    p.set_ylabel('Number of tests')
-    p.figure.savefig(path)
+def build_mean_plot(data: pd.DataFrame, path: Path):
+    plt.figure(figsize=(12, 5))
+    plt.bar(data.index, data['Mean'].values)
+    plt.xlabel('Date of tests')
+    plt.ylabel('New cases (k), rolling average)')
+    plt.savefig(path)
     plt.clf()
 
+
 def build_rate_plot(data: pd.DataFrame, path: Path):
-    sns.set(rc={
-        'figure.figsize': (12, 5),
-    })
-    p = sns.lineplot(data=data, x='Date', y='Ratio')
-    p.set_ylabel('Positive rate (%)')
-    p.figure.savefig(path)
+    plt.figure(figsize=(12, 5))
+    plt.bar(data.index, data['RollingRate'].values)
+    plt.xlabel('Date of tests')
+    plt.ylabel('Positive rate, rolling average (%)')
+    plt.savefig(path)
     plt.clf()
 
 
@@ -98,8 +96,8 @@ def build_website_cmd(args) -> None:
     os.mkdir(args.dest)
     shutil.copytree('website/static', args.dest / 'static')
 
-    plot_path = args.dest / 'static' / 'plot.png'
-    build_test_plot(data=data, path=plot_path)
+    plot_path = args.dest / 'static' / 'rolling_mean.png'
+    build_mean_plot(data=data, path=plot_path)
 
     rate_plot_path = args.dest / 'static' / 'rate_plot.png'
     build_rate_plot(data=data, path=rate_plot_path)
@@ -114,9 +112,10 @@ def build_website_cmd(args) -> None:
             title='Covid Mux',
             data=data,
             run_datetime=datetime.now(),
-            plots = ['plot', 'rate_plot'],
+            plots=['rolling_mean', 'rate_plot'],
         )
         f.write(html)
+
 
 def main():
     last_week = (date.today() - timedelta(10) - timedelta(3)).strftime('%Y-%m-%d')
