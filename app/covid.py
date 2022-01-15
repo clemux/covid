@@ -69,20 +69,24 @@ def build_data_cmd(args) -> None:
         print(formatted_data)
 
 
-def build_mean_plot(data: pd.DataFrame, path: Path):
-    plt.figure(figsize=(12, 5))
-    plt.bar(data.index, data['Mean'].values)
+def build_cases_plot(data: pd.DataFrame, base_path: Path, name: str):
+    fig, ax = plt.subplots(figsize=(12,5))
+    bars = ax.bar(data.index, data['P'].values, color='C1')
+    line = ax.plot(data.index, data['Mean'].values, color='C2')
     plt.xlabel('Date of tests')
-    plt.ylabel('New cases (k), rolling average)')
+    plt.ylabel('New cases (k)')
+
+    path = base_path / (name + '.png')
     plt.savefig(path)
     plt.clf()
 
 
 def build_rate_plot(data: pd.DataFrame, path: Path):
-    plt.figure(figsize=(12, 5))
-    plt.bar(data.index, data['RollingRate'].values)
+    fig, ax = plt.subplots(figsize=(12, 5))
+    bars = ax.bar(data.index, data['Ratio'].values, color='C1')
+    line = ax.plot(data.index, data['RollingRate'].values, color='C2')
     plt.xlabel('Date of tests')
-    plt.ylabel('Positive rate, rolling average (%)')
+    plt.ylabel('Positive rate (%)')
     plt.savefig(path)
     plt.clf()
 
@@ -96,8 +100,8 @@ def build_website_cmd(args) -> None:
     os.mkdir(args.dest)
     shutil.copytree('website/static', args.dest / 'static')
 
-    plot_path = args.dest / 'static' / 'rolling_mean.png'
-    build_mean_plot(data=data, path=plot_path)
+    base_path = args.dest / 'static'
+    build_cases_plot(data=data, base_path=base_path, name='cases')
 
     rate_plot_path = args.dest / 'static' / 'rate_plot.png'
     build_rate_plot(data=data, path=rate_plot_path)
@@ -112,7 +116,7 @@ def build_website_cmd(args) -> None:
             title='Covid Mux',
             data=data,
             run_datetime=datetime.now(),
-            plots=['rolling_mean', 'rate_plot'],
+            plots=['cases', 'rate_plot'],
         )
         f.write(html)
 
