@@ -8,7 +8,11 @@ from os.path import isdir
 from pathlib import Path
 
 import pandas as pd
+import seaborn as sns
 from jinja2 import Environment, FileSystemLoader
+from matplotlib import pyplot as plt
+
+from app.lib.templates import datetime_format
 
 
 def get_latest_data(start_date: date) -> pd.DataFrame:
@@ -66,23 +70,23 @@ def build_data_cmd(args) -> None:
         print(formatted_data)
 
 
-# def build_test_plot(data: pd.DataFrame, path: Path):
-#     sns.set(rc={
-#         'figure.figsize': (12, 5),
-#     })
-#     p = sns.lineplot(data=data, x='Date', y='T')
-#     p.set_ylabel('Number of tests')
-#     p.figure.savefig(path)
-#     plt.clf()
-#
-# def build_rate_plot(data: pd.DataFrame, path: Path):
-#     sns.set(rc={
-#         'figure.figsize': (12, 5),
-#     })
-#     p = sns.lineplot(data=data, x='Date', y='Ratio')
-#     p.set_ylabel('Positive rate (%)')
-#     p.figure.savefig(path)
-#     plt.clf()
+def build_test_plot(data: pd.DataFrame, path: Path):
+    sns.set(rc={
+        'figure.figsize': (12, 5),
+    })
+    p = sns.lineplot(data=data, x='Date', y='T')
+    p.set_ylabel('Number of tests')
+    p.figure.savefig(path)
+    plt.clf()
+
+def build_rate_plot(data: pd.DataFrame, path: Path):
+    sns.set(rc={
+        'figure.figsize': (12, 5),
+    })
+    p = sns.lineplot(data=data, x='Date', y='Ratio')
+    p.set_ylabel('Positive rate (%)')
+    p.figure.savefig(path)
+    plt.clf()
 
 
 def build_website_cmd(args) -> None:
@@ -94,11 +98,11 @@ def build_website_cmd(args) -> None:
     os.mkdir(args.dest)
     shutil.copytree('website/static', args.dest / 'static')
 
-    # plot_path = args.dest / 'static' / 'plot.png'
-    # build_test_plot(data=data, path=plot_path)
-    #
-    # rate_plot_path = args.dest / 'static' / 'rate_plot.png'
-    # build_rate_plot(data=data, path=rate_plot_path)
+    plot_path = args.dest / 'static' / 'plot.png'
+    build_test_plot(data=data, path=plot_path)
+
+    rate_plot_path = args.dest / 'static' / 'rate_plot.png'
+    build_rate_plot(data=data, path=rate_plot_path)
 
     # Jinja2 setup
     env = Environment(loader=FileSystemLoader('website'))
