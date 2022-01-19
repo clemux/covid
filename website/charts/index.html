@@ -31,7 +31,7 @@
   startDatePicker = document.getElementById('startDatePicker')
   startDatePicker.onchange = function() {
 
-      apiData = fetch('/data?start=' + startDatePicker.value)
+      apiData = fetch('data?start=' + startDatePicker.value)
           .then(response => response.json())
           .then(data => updateTable(data))
   }
