@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="static/main.css">
+</head>
+<body>
+    <label for="startDatePicker">Start date:</label>
+
+    <input type="date" id="startDatePicker">
+    <table id="positive"></table>
+</body>
+</html>
+<script>
+  function updateTable(data) {
+      const positives_cases = Object.entries(data['P'])
+      table = document.getElementById('positive')
+      positives_cases.forEach(([timestamp, value]) => {
+          newRow = table.insertRow()
+          date = new Date(parseInt(timestamp))
+          dateCell = newRow.insertCell()
+          dateCell.appendChild(document.createTextNode(date.toDateString()))
+
+          valueCell = newRow.insertCell()
+          valueCell.appendChild(document.createTextNode(value))
+      })
+      console.log(positives_cases)
+  }
+
+  startDatePicker = document.getElementById('startDatePicker')
+  startDatePicker.onchange = function() {
+
+      apiData = fetch('/data?start=' + startDatePicker.value)
+          .then(response => response.json())
+          .then(data => updateTable(data))
+  }
+
+</script>
