@@ -19,8 +19,9 @@
         <tr>
             <th>Date (D-3)</th>
             <th>Daily cases</th>
-            <th>Daily tests</th>
             <th>Daily cases (rolling average 7d)</th>
+            <th>Daily tests</th>
+            <th>Daily tests (rolling avg)</th>
             <th>Positive tests rate</th>
             <th>Rate, rolling average (7d)</th>
         </tr>
@@ -30,8 +31,9 @@
             <tr>
                 <td>{{ date.strftime('%Y-%m-%d') }}</td>
                 <td>{{ row['P'] }}k</td>
-                <td>{{ row['T'] }}k</td>
                 <td>{{ row['Mean']}}k</td>
+                <td>{{ row['T'] }}k</td>
+                <td>{{ row['RollingTests']}}k</td>
                 <td>{{ row['Ratio']}}%</td>
                 <td>{{ row['RollingRate']}}%</td>
             </tr>

@@ -44,6 +44,11 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     )
     everyone_data.loc[:, 'RollingRate'] = rolling_rate
 
+    rolling_tests = (
+        (t/1000).rolling(min_periods=1, window=7).mean().round(decimals=1)
+    )
+    everyone_data.loc[:, 'RollingTests'] = rolling_tests
+
     latest_data = everyone_data.loc[start_date:end_date].copy()
     latest_data = latest_data.drop(['cl_age90'], axis=1)
     latest_data = latest_data.drop(['pop'], axis=1)
@@ -93,6 +98,17 @@ def build_rate_plot(data: pd.DataFrame, path: Path):
     plt.clf()
 
 
+def build_tests_plot(data: pd.DataFrame, base_path: Path, name: str):
+    fig, ax = plt.subplots(figsize=(12, 5))
+    bars = ax.bar(data.index, data['T'].values, color='C1')
+    line = ax.plot(data.index, data['RollingTests'].values, color='C2')
+    plt.xlabel('Date')
+    plt.ylabel('Number of tests (k)')
+
+    path = base_path / (name + '.png')
+    plt.savefig(path)
+    plt.clf()
+
 def build_website_cmd(args) -> None:
     start = datetime.strptime(args.start, '%Y-%m-%d')
     data = get_latest_data(start)
@@ -105,8 +121,11 @@ def build_website_cmd(args) -> None:
     base_path = args.dest / 'static'
     build_cases_plot(data=data, base_path=base_path, name='cases')
 
+    build_tests_plot(data=data, base_path=base_path, name='tests')
+
     rate_plot_path = args.dest / 'static' / 'rate_plot.png'
     build_rate_plot(data=data, path=rate_plot_path)
+
 
     # Jinja2 setup
     env = Environment(loader=FileSystemLoader('website'))
@@ -118,7 +137,7 @@ def build_website_cmd(args) -> None:
             title='Covid Mux',
             data=data,
             run_datetime=datetime.now(),
-            plots=['cases', 'rate_plot'],
+            plots=['cases', 'tests', 'rate_plot'],
         )
         f.write(html)
 
