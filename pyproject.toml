@@ -1,3 +1,24 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+[tool]
+[tool.pdm]
+[[tool.pdm.source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Clément Schreiner", email = "clement@mux.me"},
+]
+license-expression = "MIT"
+dependencies = ["aiogram", "fastapi", "Jinja2", "pandas", "seaborn", "tinydb", "uvicorn"]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = ""
