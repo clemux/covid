@@ -7,7 +7,7 @@
     <script src="static/chart.js"></script>
 </head>
 <body>
-    <canvas id="chart" width="400" height="400"></canvas>
+<canvas id="chart" width="400" height="400"></canvas>
 </body>
 </html>
 <script>
@@ -15,23 +15,56 @@
         const ctx = document.getElementById('chart');
         const myChart = new Chart(ctx, {
             data: {
-                datasets: [{
-                    data: data,
-                    type: 'bar',
-                    label: 'New cases'
-                }]
+                datasets: [
+                    {
+                        data: data,
+                        type: 'bar',
+                        label: 'New cases (k)',
+                        parsing: {
+                            xAxisKey: 'date',
+                            yAxisKey: 'positive_tests'
+                        },
+                    },
+                    {
+                        data: data,
+                        type: 'line',
+                        label: 'Rolling average (k)',
+                        parsing: {
+                            xAxisKey: 'date',
+                            yAxisKey: 'rolling_average'
+                        }
+                    }
+                ]
             },
             options: {
-                parsing: {
-                    xAxisKey: 'date',
-                    yAxisKey: 'positive_tests'
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function (value, index, ticks) {
+                                return value + 'k';
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: 'rgb(255, 99, 132)'
+                        }
+                    }
                 }
             }
         })
-        myChart.canvas.parentNode.style.height = '128px';
+        return myChart
     }
-    apiData = fetch('data?start=2022-01-01')
-          .then(response => response.json())
-          .then(data => updateChart(data))
+
+    chart = fetch('data?start=2022-01-01')
+        .then(response => response.json())
+        .then(data => updateChart(data))
 
 </script>
