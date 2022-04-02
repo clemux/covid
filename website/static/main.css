@@ -19,7 +19,7 @@ blockquote {
 
 /* spacing */
 
-table {
+table#positive {
   table-layout: fixed;
   width: 100%;
   border: #000000;
