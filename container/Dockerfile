@@ -1,18 +1,18 @@
-FROM fedora-minimal:latest
+FROM python:3.9
 
-WORKDIR /opt/covid
+RUN useradd -ms /bin/bash covid
+
+USER covid
+
+WORKDIR /home/covid
 
 COPY app/ app/
-COPY bot/ bot/
-COPY setup.cfg .
-COPY pyproject.toml .
-
 COPY website/ website/
+COPY pyproject.toml .
+COPY pdm.lock .
 
-RUN microdnf -y update && microdnf -y install python3.10 && microdnf clean all
+# RUN apt update && apt upgrade -y
+RUN pip install --user pdm
+RUN ~/.local/bin/pdm install
 
-RUN python3 -m venv venv
-RUN venv/bin/pip install -U pip
-RUN venv/bin/pip install .
-
-ENTRYPOINT ["/opt/covid/venv/bin/covidmux"]
+ENTRYPOINT [".local/bin/pdm", "run"]
