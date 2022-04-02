@@ -17,7 +17,16 @@ authors = [
     {name = "Clément Schreiner", email = "clement@mux.me"},
 ]
 license-expression = "MIT"
-dependencies = ["aiogram", "fastapi", "Jinja2", "pandas", "seaborn", "tinydb", "uvicorn"]
+dependencies = [
+    "aiogram",
+    "fastapi",
+    "Jinja2",
+    "pandas",
+    "seaborn",
+    "tinydb",
+    "uvicorn",
+    "sqlalchemy>=1.4.34",
+]
 requires-python = ">=3.9"
 
 [project.urls]
