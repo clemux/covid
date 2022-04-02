@@ -8,6 +8,8 @@ from os.path import isdir
 from pathlib import Path
 
 import pandas as pd
+from app.db import models
+from app.db.database import engine, SessionLocal
 from jinja2 import Environment, FileSystemLoader
 from matplotlib import pyplot as plt
 
@@ -45,7 +47,7 @@ def get_latest_data(start_date: date) -> pd.DataFrame:
     everyone_data.loc[:, 'RollingRate'] = rolling_rate
 
     rolling_tests = (
-        (t/1000).rolling(min_periods=1, window=7).mean().round(decimals=1)
+        (t / 1000).rolling(min_periods=1, window=7).mean().round(decimals=1)
     )
     everyone_data.loc[:, 'RollingTests'] = rolling_tests
 
@@ -109,6 +111,7 @@ def build_tests_plot(data: pd.DataFrame, base_path: Path, name: str):
     plt.savefig(path)
     plt.clf()
 
+
 def build_website_cmd(args) -> None:
     start = datetime.strptime(args.start, '%Y-%m-%d')
     data = get_latest_data(start)
@@ -126,7 +129,6 @@ def build_website_cmd(args) -> None:
     rate_plot_path = args.dest / 'static' / 'rate_plot.png'
     build_rate_plot(data=data, path=rate_plot_path)
 
-
     # Jinja2 setup
     env = Environment(loader=FileSystemLoader('website'))
     env.filters['datetime_format'] = datetime_format
@@ -140,6 +142,14 @@ def build_website_cmd(args) -> None:
             plots=['cases', 'tests', 'rate_plot'],
         )
         f.write(html)
+
+
+def update_db_cmd(args):
+    models.Base.metadata.create_all(bind=engine)
+    session = SessionLocal()
+    data = get_latest_data(date.today() - timedelta(days=7))
+
+    data.to_sql('cases', engine, if_exists='replace')
 
 
 def main():
@@ -161,6 +171,9 @@ def main():
     build_website_parser.add_argument('--start', required=False, default=last_week)
 
     build_website_parser.set_defaults(func=build_website_cmd)
+
+    update_db_parser = sub_parsers.add_parser('update-db')
+    update_db_parser.set_defaults(func=update_db_cmd)
 
     args = parser.parse_args()
     args.func(args)
