@@ -1,3 +1,8 @@
 /venv/
 /.idea/
 public/
+out/
+test/
+tmp/
+build/
+website/node_modules
