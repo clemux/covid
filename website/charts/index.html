@@ -24,6 +24,9 @@
                             xAxisKey: 'date',
                             yAxisKey: 'positive_tests'
                         },
+                        backgroundColor: [
+                           'rgba(255,115,0,0.2)'
+                        ]
                     },
                     {
                         data: data,
@@ -32,7 +35,8 @@
                         parsing: {
                             xAxisKey: 'date',
                             yAxisKey: 'rolling_average'
-                        }
+                        },
+                        borderColor: 'rgb(3,155,14)'
                     }
                 ]
             },
@@ -54,7 +58,7 @@
                     legend: {
                         display: true,
                         labels: {
-                            color: 'rgb(255, 99, 132)'
+                            color: 'rgb(0,0,0)'
                         }
                     }
                 }
