@@ -146,8 +146,8 @@ def build_website_cmd(args) -> None:
 
 def update_db_cmd(args):
     models.Base.metadata.create_all(bind=engine)
-    session = SessionLocal()
-    data = get_latest_data(date.today() - timedelta(days=7))
+    start = datetime.strptime(args.start, '%Y-%m-%d')
+    data = get_latest_data(start)
 
     data.to_sql('cases', engine, if_exists='replace')
 
@@ -173,6 +173,7 @@ def main():
     build_website_parser.set_defaults(func=build_website_cmd)
 
     update_db_parser = sub_parsers.add_parser('update-db')
+    update_db_parser.add_argument('--start', required=False, default=last_week)
     update_db_parser.set_defaults(func=update_db_cmd)
 
     args = parser.parse_args()
