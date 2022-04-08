@@ -26,6 +26,7 @@ async def homepage(request):
 
 app = FastAPI(routes=[
     Route('/index.html', homepage),
+    Route('/', homepage),
     Mount('/static', StaticFiles(directory='website/static'), name='static')
 ])
 
