@@ -8,4 +8,5 @@ class Cases(Base):
     positive_tests = Column('P', Integer)
     tests = Column('T', Integer)
     rolling_average = Column('Mean', Float)
+    positive_rate = Column('RollingRate', Float)
 

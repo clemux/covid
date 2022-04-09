@@ -26,27 +26,52 @@
                         },
                         backgroundColor: [
                            'rgba(255,115,0,0.2)'
-                        ]
+                        ],
+                        yAxisID: 'y1'
                     },
                     {
                         data: data,
                         type: 'line',
-                        label: 'Rolling average (k)',
+                        label: 'Average new cases (k)',
                         parsing: {
                             xAxisKey: 'date',
                             yAxisKey: 'rolling_average'
                         },
+                        yAxisID: 'y1',
                         borderColor: 'rgb(3,155,14)'
+                    },
+                    {
+                        data: data,
+                        type: 'line',
+                        label: 'Average positive rate (%)',
+                        yAxisID: 'y2',
+                        parsing: {
+                            xAxisKey: 'date',
+                            yAxisKey: 'positive_rate'
+                        },
+                        borderColor: 'rgb(0,155,255)',
+                        fill: true
                     }
                 ]
             },
             options: {
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
+                    y1: {
                         ticks: {
                             callback: function (value, index, ticks) {
                                 return value + 'k';
+                            }
+                        }
+                    },
+                    y2: {
+                        position: 'right',
+                        min: 0,
+                        max: 50,
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function (value, index, ticks) {
+                                return value + '%';
                             }
                         }
                     }
