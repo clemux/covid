@@ -11,8 +11,19 @@
 </body>
 </html>
 <script>
+
     function updateChart(data) {
         const ctx = document.getElementById('chart');
+        const footer = (tooltipItems) => {
+            const date = tooltipItems[0].label;
+            pointData = data.find(function (point, index) {
+                if (point.date === date) {
+                    return true;
+                }
+            });
+            let nbTests = pointData.rolling_tests;
+            return "Average daily tests: " + nbTests + 'k';
+        }
         const myChart = new Chart(ctx, {
             data: {
                 datasets: [
@@ -25,7 +36,7 @@
                             yAxisKey: 'positive_tests'
                         },
                         backgroundColor: [
-                           'rgba(255,115,0,0.2)'
+                            'rgba(0,155,255,0.2)'
                         ],
                         yAxisID: 'y1'
                     },
@@ -84,6 +95,11 @@
                         display: true,
                         labels: {
                             color: 'rgb(0,0,0)'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            footer: footer,
                         }
                     }
                 }

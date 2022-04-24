@@ -9,6 +9,7 @@ class CasesBase(BaseModel):
     tests: int
     rolling_average: float
     positive_rate: float
+    rolling_tests: float
 
 
 class Cases(CasesBase):
